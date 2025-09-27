@@ -10,14 +10,14 @@ export const services: Service[] = [
   { id: 'design-henna', name: 'Design sobrancelhas com henna', duration: '1h', price: 30, category: 'eyebrows' },
   
   // Progressivas
-  { id: 'progressiva-curto', name: 'Progressiva cabelo curto', duration: '4h', price: 170, category: 'treatments' },
-  { id: 'progressiva-medio', name: 'Progressiva cabelo médio', duration: '4h30', price: 200, category: 'treatments' },
-  { id: 'progressiva-longo', name: 'Progressiva cabelo longo', duration: '4h', price: 200, category: 'treatments' },
+  { id: 'progressiva-curto', name: 'Progressiva cabelo curto', duration: '4h', price: 160, category: 'treatments' },
+  { id: 'progressiva-medio', name: 'Progressiva cabelo médio', duration: '4h30', price: 180, category: 'treatments' },
+  { id: 'progressiva-longo', name: 'Progressiva cabelo longo', duration: '4h', price: 210, category: 'treatments' },
   { id: 'progressiva-extra-longo', name: 'Progressiva cabelo extra longo', duration: '4h30', price: 280, category: 'treatments' },
   
   // Reconstrução e Nutrição
-  { id: 'reconstrucao-escova', name: 'Reconstrução + escova', duration: '2h', price: 80, category: 'treatments' },
-  { id: 'nutricao-escova', name: 'Nutrição + escova', duration: '2h', price: 75, category: 'treatments' },
+  { id: 'reconstrucao-escova', name: 'Reconstrução + escova', duration: '2h', price: 70, category: 'treatments' },
+  { id: 'nutricao-escova', name: 'Nutrição + escova', duration: '2h', price: 70, category: 'treatments' },
   { id: 'nutricao-sem-escova', name: 'Nutrição sem escova', duration: '30min', price: 40, category: 'treatments' },
   
   // Escova e Hidratação
@@ -31,8 +31,8 @@ export const services: Service[] = [
   { id: 'aplicacao-tinta', name: 'Aplicação tinta (sem escova)', duration: '40min', price: 40, category: 'hair' },
   
   // Tratamentos Especiais
-  { id: 'botox-capilar', name: 'Botox capilar', duration: '4h', price: 150, category: 'treatments', description: 'a partir de' },
-  { id: 'cauterizacao-escova', name: 'Cauterização + escova', duration: '1h30', price: 80, category: 'treatments' },
+  { id: 'botox-capilar', name: 'Botox capilar', duration: '4h', price: 130, category: 'treatments', description: 'a partir de' },
+  { id: 'cauterizacao-escova', name: 'Cauterização + escova', duration: '1h30', price: 70, category: 'treatments' },
   { id: 'corte-limpeza', name: 'Corte (limpeza de pontas)', duration: '5min', price: 20, category: 'hair' },
   
   // Cronograma Capilar

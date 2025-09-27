@@ -1,3 +1,4 @@
+// src/components/Cart.tsx
 import { supabase } from '@/lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, ShoppingBag, Trash2, MessageCircle } from 'lucide-react';
@@ -27,6 +28,7 @@ export const Cart = () => {
   const [descricao, setDescricao] = useState('');
   const [data, setData] = useState<Date | null>(null);
   const [hora, setHora] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // novo estado
 
   // Lista de horários disponíveis
   const horariosDisponiveis = [
@@ -60,59 +62,102 @@ ${services}
 Gostaria de agendar esses serviços! 💖`;
   };
 
-  // Função para salvar no banco antes de abrir o WhatsApp
+  // Salva e checa duplicidade no BD — retorna objeto com resultado detalhado
   const saveBooking = async () => {
-    if (!nome || !descricao || !data || !hora) {
-      alert('Por favor, preencha nome, descrição, data e horário antes de continuar.');
-      return false;
+    const dateStr = data ? data.toISOString().split('T')[0] : null;
+    if (!dateStr) {
+      return { success: false, error: new Error('Data inválida'), conflict: false };
     }
 
-    // Verifica se já existe agendamento na mesma data e hora
-    const { data: existing, error: checkError } = await supabase
-      .from('STUDIO_BRUNA') // ALTERADO
-      .select('*')
-      .eq('data', data.toISOString().split('T')[0])
-      .eq('hora', hora);
+    try {
+      // Verifica se já existe agendamento na mesma data e hora
+      const { data: existing, error: checkError } = await supabase
+        .from('STUDIO_BRUNA')
+        .select('id')
+        .eq('data', dateStr)
+        .eq('hora', hora)
+        .limit(1);
 
-    if (checkError) {
-      console.error('Erro ao verificar agendamento:', checkError);
-      alert('Erro ao verificar o horário. Tente novamente.');
-      return false;
+      if (checkError) {
+        return { success: false, error: checkError, conflict: false };
+      }
+
+      if (existing && existing.length > 0) {
+        return { success: false, error: null, conflict: true };
+      }
+
+      // Insere o agendamento
+      const { error: insertError } = await supabase
+        .from('STUDIO_BRUNA')
+        .insert({
+          nome,
+          descricao,
+          data: dateStr,
+          hora,
+        });
+
+      if (insertError) {
+        return { success: false, error: insertError, conflict: false };
+      }
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err as Error, conflict: false };
     }
-
-    if (existing && existing.length > 0) {
-      alert('Desculpe, este horário já está ocupado. Escolha outro.');
-      return false;
-    }
-
-    // Salva o agendamento
-    const { error } = await supabase
-      .from('STUDIO_BRUNA') // ALTERADO
-      .insert({
-        nome,
-        descricao,
-        data: data.toISOString().split('T')[0], // salva apenas a data
-        hora,
-      });
-
-    if (error) {
-      console.error('Erro ao salvar agendamento:', error);
-      alert('Erro ao salvar o agendamento. Tente novamente.');
-      return false;
-    }
-
-    return true;
   };
 
+  // Handler que abre popup SINCRONAMENTE para evitar bloqueio no Safari
   const handleWhatsAppRedirect = async () => {
-    const saved = await saveBooking();
-    if (!saved) return;
+    // validações front-end
+    if (!nome || !descricao || !data || !hora) {
+      alert('Por favor, preencha nome, descrição, data e horário antes de continuar.');
+      return;
+    }
 
-    const message = generateWhatsAppMessage();
-    const phoneNumber = '5511986304563';
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    
-    window.open(whatsappUrl, '_blank');
+    // Abre uma janela/guia em branco imediatamente — isso garante que navegadores móveis
+    // não bloqueiem o popup, pois foi aberto dentro do evento de clique do usuário.
+    const newWindow = window.open('', '_blank');
+
+    setIsLoading(true);
+
+    try {
+      const result = await saveBooking();
+
+      if (!result.success) {
+        if (result.conflict) {
+          alert('Desculpe, este horário já está ocupado. Escolha outro.');
+        } else {
+          console.error('Erro ao salvar agendamento:', result.error);
+          alert('Erro ao salvar o agendamento. Tente novamente.');
+        }
+        // Fecha a janela em branco caso não tenha sido possível salvar
+        if (newWindow) {
+          try { newWindow.close(); } catch (e) { /* ignorar */ }
+        }
+        return;
+      }
+
+      // Se chegou aqui, salvou com sucesso — gera a mensagem e redireciona a janela aberta
+      const message = generateWhatsAppMessage();
+      const phoneNumber = '5511986304563';
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+      if (newWindow) {
+        // redireciona a janela já aberta para o WhatsApp
+        newWindow.location.href = whatsappUrl;
+      } else {
+        // fallback — abrir normalmente (pode ser bloqueado em alguns navegadores)
+        window.open(whatsappUrl, '_blank');
+      }
+    } catch (err) {
+      console.error('Erro inesperado:', err);
+      alert('Falha inesperada. Atualize a página e tente novamente.');
+      if (newWindow) {
+        try { newWindow.close(); } catch (e) { /* ignorar */ }
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -247,6 +292,7 @@ Gostaria de agendar esses serviços! 💖`;
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    disabled={isLoading}
                   />
                   <textarea
                     placeholder="Descreva seu cabelo"
@@ -254,6 +300,7 @@ Gostaria de agendar esses serviços! 💖`;
                     onChange={(e) => setDescricao(e.target.value)}
                     className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                     rows={3}
+                    disabled={isLoading}
                   />
                   <DatePicker
                     selected={data}
@@ -263,11 +310,13 @@ Gostaria de agendar esses serviços! 💖`;
                     minDate={new Date()}
                     dateFormat="dd/MM/yyyy"
                     locale="pt-BR"
+                    disabled={isLoading}
                   />
                   <select
                     value={hora}
                     onChange={(e) => setHora(e.target.value)}
                     className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    disabled={isLoading}
                   >
                     <option value="">Escolha o horário</option>
                     {horariosDisponiveis.map((h) => (
@@ -289,9 +338,10 @@ Gostaria de agendar esses serviços! 💖`;
                     variant="gradient"
                     size="lg"
                     className="w-full"
+                    disabled={isLoading}
                   >
                     <MessageCircle className="h-4 w-4" />
-                    Agendar via WhatsApp
+                    {isLoading ? 'Agendando...' : 'Agendar via WhatsApp'}
                   </Button>
                   
                   <Button
@@ -299,6 +349,7 @@ Gostaria de agendar esses serviços! 💖`;
                     variant="outline"
                     size="sm"
                     className="w-full"
+                    disabled={isLoading}
                   >
                     Limpar Tudo
                   </Button>
