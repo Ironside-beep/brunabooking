@@ -45,6 +45,7 @@ export const ServiceCard = ({ service, index }: ServiceCardProps) => {
                 {service.name}
               </h3>
               
+              {/* Exibe a descrição se existir */}
               {service.description && (
                 <p className="text-sm text-muted-foreground mb-3">
                   {service.description}

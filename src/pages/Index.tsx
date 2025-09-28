@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import { Header } from '@/components/Header';
 import { MobileMenu } from '@/components/MobileMenu';
 import { HeroSection } from '@/components/HeroSection';
@@ -14,6 +16,28 @@ const Index = () => {
   const handleMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  // ----------------------------
+  // Alert de sinal ao carregar
+  // ----------------------------
+  useEffect(() => {
+    Swal.fire({
+      title: 'Aviso Importante',
+      text: 'Para os procedimentos é necessário um sinal de R$20, que deve ser combinado com a profissional ao finalizar o agendamento.',
+      icon: 'info',
+      confirmButtonText: 'Entendi',
+      confirmButtonColor: '#E75480', // rosa combinando com a estética do site
+      background: '#fff0f6', // leve rosa de fundo
+      color: '#5a2a45', // cor do texto
+      iconColor: '#E75480', // cor do ícone
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      }
+    });
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-background font-inter">
@@ -36,7 +60,6 @@ const Index = () => {
 
         {/* Services */}
         <ServiceGrid />
-
 
         {/* Business Hours & Location */}
         <BusinessHours />
