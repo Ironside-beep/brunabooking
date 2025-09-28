@@ -65,8 +65,8 @@ ${services}
 
 👤 *Nome:* ${nome || '[Não informado]'}
 📅 *Data preferida:* ${dataFormatada}
-🕐 *Horário preferido:* ${hora || '[Não informado]'}
-💇‍♀️ *Descrição do cabelo:* ${descricao || '[Não informado]'}
+🕐 *Horário preferido:* ${hora || '[Não informada]'}
+💇‍♀️ *Descrição do cabelo:* ${descricao || '[Não informada]'}
 
 Gostaria de agendar esses serviços! 💖`;
   };
@@ -203,7 +203,7 @@ Gostaria de agendar esses serviços! 💖`;
         .from('STUDIO_BRUNA')
         .insert({
           nome,
-          descricao,
+          descricao: descricao && descricao.trim() !== '' ? descricao : null,
           data: startTimeISO,
           hora: horaDB,
           end_time: endTimeISO,
@@ -269,10 +269,11 @@ Gostaria de agendar esses serviços! 💖`;
   // Handler WhatsApp
   // -------------------
   const handleWhatsAppRedirect = async () => {
-    if (!nome || !descricao || !data || !hora) {
+    // descrição agora é opcional — não faz parte da validação obrigatória
+    if (!nome || !data || !hora) {
       await Swal.fire({
         title: 'Campos incompletos',
-        text: 'Por favor, preencha nome, descrição, data e horário antes de continuar.',
+        text: 'Por favor, preencha nome, data e horário antes de continuar.',
         icon: 'info',
         confirmButtonText: 'Ok',
         confirmButtonColor: '#E75480',
@@ -435,7 +436,7 @@ Gostaria de agendar esses serviços! 💖`;
               >
                 <div className="space-y-3">
                   <input type="text" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" disabled={isLoading} />
-                  <textarea placeholder="Descreva seu cabelo" value={descricao} onChange={(e) => setDescricao(e.target.value)} className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none" rows={3} disabled={isLoading} />
+                  <textarea placeholder="Descreva seu cabelo (opcional)" value={descricao} onChange={(e) => setDescricao(e.target.value)} className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none" rows={3} disabled={isLoading} />
                   <DatePicker selected={data} onChange={(date) => setData(date)} placeholderText="Escolha a data" className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" minDate={new Date()} dateFormat="dd/MM/yyyy" locale="pt-BR" disabled={isLoading} />
                   <select value={hora} onChange={(e) => setHora(e.target.value)} className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" disabled={isLoading}>
                     <option value="">Escolha o horário</option>
