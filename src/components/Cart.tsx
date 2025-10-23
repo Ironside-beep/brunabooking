@@ -17,14 +17,14 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 registerLocale('pt-BR', ptBR);
 
 export const Cart = () => {
-  const { 
-    state, 
-    removeItem, 
-    updateQuantity, 
-    clearCart, 
-    closeCart, 
-    getTotalPrice, 
-    getTotalItems 
+  const {
+    state,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    closeCart,
+    getTotalPrice,
+    getTotalItems
   } = useCart();
 
   // Estados para Nome, Descrição, Data e Hora
@@ -49,13 +49,13 @@ export const Cart = () => {
   // -------------------
 
   const generateWhatsAppMessage = () => {
-    const services = state.items.map(item => 
+    const services = state.items.map(item =>
       `• ${item.name} (${item.quantity}x) - R$ ${(item.price * item.quantity).toFixed(2)}`
     ).join('\n');
-    
+
     const total = getTotalPrice().toFixed(2);
     const dataFormatada = data ? data.toLocaleDateString('pt-BR') : '[Não informada]';
-    
+
     return `🌸 *AGENDAMENTO STUDIO BRUNA* 🌸
 
 📋 *Serviços Selecionados:*
@@ -172,13 +172,13 @@ Gostaria de agendar esses serviços! 💖`;
         else if (bData instanceof Date) datePart = bData.toISOString().split('T')[0];
 
         let startDate: Date | null = null;
-        if (bHora && datePart) startDate = new Date(`${datePart}T${String(bHora).slice(0,8)}`);
+        if (bHora && datePart) startDate = new Date(`${datePart}T${String(bHora).slice(0, 8)}`);
         else if (typeof bData === 'string' && bData.includes('T')) startDate = new Date(bData);
         else if (bData instanceof Date) startDate = new Date(bData);
 
         let endDate: Date | null = null;
         if (typeof bEnd === 'string' && bEnd.includes('T')) endDate = new Date(bEnd);
-        else if (typeof bEnd === 'string' && datePart) endDate = new Date(`${datePart}T${String(bEnd).slice(0,8)}`);
+        else if (typeof bEnd === 'string' && datePart) endDate = new Date(`${datePart}T${String(bEnd).slice(0, 8)}`);
         else if (bEnd instanceof Date) endDate = new Date(bEnd);
 
         return { startDate, endDate };
@@ -227,8 +227,8 @@ Gostaria de agendar esses serviços! 💖`;
   useEffect(() => {
     const fetchHorariosOcupados = async () => {
       if (!data) return setHorariosOcupados([]);
-      const dayStart = new Date(data); dayStart.setHours(0,0,0,0);
-      const dayEnd = new Date(data); dayEnd.setHours(23,59,59,999);
+      const dayStart = new Date(data); dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(data); dayEnd.setHours(23, 59, 59, 999);
 
       const { data: existing, error } = await supabase
         .from('STUDIO_BRUNA')
@@ -248,13 +248,13 @@ Gostaria de agendar esses serviços! 💖`;
         if (!start || !end) return;
 
         const [hStr, mStr] = start.split(':');
-        const startMin = Number(hStr)*60 + Number(mStr);
+        const startMin = Number(hStr) * 60 + Number(mStr);
 
-        const endMin = end.getHours()*60 + end.getMinutes();
+        const endMin = end.getHours() * 60 + end.getMinutes();
 
         horariosDisponiveis.forEach(h => {
           const [hh, mm] = h.split(':').map(Number);
-          const timeMin = hh*60 + mm;
+          const timeMin = hh * 60 + mm;
           if (timeMin >= startMin && timeMin < endMin) ocupados.push(h);
         });
       });
@@ -314,7 +314,7 @@ Gostaria de agendar esses serviços! 💖`;
             iconColor: '#E75480'
           });
         }
-        if (newWindow) try { newWindow.close(); } catch(e){}
+        if (newWindow) try { newWindow.close(); } catch (e) { }
         return;
       }
 
@@ -336,10 +336,15 @@ Gostaria de agendar esses serviços! 💖`;
         color: '#5a2a45',
         iconColor: '#E75480'
       });
-      if (newWindow) try { newWindow.close(); } catch(e){}
+      if (newWindow) try { newWindow.close(); } catch (e) { }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handler específico para DatePicker com tipagem correta
+  const handleDateChange = (date: Date | null) => {
+    setData(date);
   };
 
   // -------------------
@@ -435,28 +440,78 @@ Gostaria de agendar esses serviços! 💖`;
                 className="flex-shrink-0 p-6 border-t border-border/50 space-y-4"
               >
                 <div className="space-y-3">
-                  <input type="text" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" disabled={isLoading} />
-                  <textarea placeholder="Descreva seu cabelo (opcional)" value={descricao} onChange={(e) => setDescricao(e.target.value)} className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none" rows={3} disabled={isLoading} />
-                  <DatePicker selected={data} onChange={(date) => setData(date)} placeholderText="Escolha a data" className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" minDate={new Date()} dateFormat="dd/MM/yyyy" locale="pt-BR" disabled={isLoading} />
-                  <select value={hora} onChange={(e) => setHora(e.target.value)} className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" disabled={isLoading}>
+                  <input 
+                    type="text" 
+                    placeholder="Seu nome" 
+                    value={nome} 
+                    onChange={(e) => setNome(e.target.value)} 
+                    className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" 
+                    disabled={isLoading} 
+                  />
+                  
+                  <textarea 
+                    placeholder="Descreva seu cabelo (opcional)" 
+                    value={descricao} 
+                    onChange={(e) => setDescricao(e.target.value)} 
+                    className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none" 
+                    rows={3} 
+                    disabled={isLoading} 
+                  />
+                  
+                  <DatePicker 
+                    selected={data} 
+                    onChange={handleDateChange}
+                    placeholderText="Escolha a data" 
+                    className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" 
+                    minDate={new Date()} 
+                    dateFormat="dd/MM/yyyy" 
+                    locale="pt-BR" 
+                    disabled={isLoading}
+                    wrapperClassName="w-full"
+                  />
+                  
+                  <select 
+                    value={hora} 
+                    onChange={(e) => setHora(e.target.value)} 
+                    className="w-full rounded-md border border-border/50 bg-background/70 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" 
+                    disabled={isLoading}
+                  >
                     <option value="">Escolha o horário</option>
                     {horariosDisponiveis.map((h) => (
-                      <option key={h} value={h} disabled={horariosOcupados.includes(h)}>{h}{horariosOcupados.includes(h) ? ' (ocupado)' : ''}</option>
+                      <option key={h} value={h} disabled={horariosOcupados.includes(h)}>
+                        {h}{horariosOcupados.includes(h) ? ' (ocupado)' : ''}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total:</span>
-                  <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">R$ {getTotalPrice().toFixed(2)}</span>
+                  <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                    R$ {getTotalPrice().toFixed(2)}
+                  </span>
                 </div>
 
                 <div className="space-y-2">
-                  <Button onClick={handleWhatsAppRedirect} variant="gradient" size="lg" className="w-full" disabled={isLoading}>
+                  <Button 
+                    onClick={handleWhatsAppRedirect} 
+                    variant="gradient" 
+                    size="lg" 
+                    className="w-full" 
+                    disabled={isLoading}
+                  >
                     <MessageCircle className="h-4 w-4" />
                     {isLoading ? 'Agendando...' : 'Agendar via WhatsApp'}
                   </Button>
-                  <Button onClick={clearCart} variant="outline" size="sm" className="w-full" disabled={isLoading}>Limpar Tudo</Button>
+                  <Button 
+                    onClick={clearCart} 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full" 
+                    disabled={isLoading}
+                  >
+                    Limpar Tudo
+                  </Button>
                 </div>
               </motion.div>
             )}

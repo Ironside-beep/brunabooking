@@ -51,10 +51,7 @@ export const HeroSection = () => {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="inline-flex items-center space-x-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-full px-4 py-2 shadow-elegant"
           >
-            <Star className="h-4 w-4 text-primary animate-pulse" />
-            <span className="text-sm font-medium text-muted-foreground">
-              Salão de Beleza Premium
-            </span>
+            
           </motion.div>
 
           {/* Main Title */}

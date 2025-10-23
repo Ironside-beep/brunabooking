@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MessageCircle } from 'lucide-react';
+import { Calendar, MessageCircle, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 
 export const FloatingScheduleButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -38,124 +37,186 @@ Obrigada! 💖`;
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          exit={{ scale: 0, rotate: 180 }}
-          className="fixed bottom-6 right-6 z-50"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="fixed bottom-8 right-8 z-50"
         >
           {/* Expanded Menu */}
           <AnimatePresence>
             {isExpanded && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="absolute bottom-16 right-0 bg-card/95 backdrop-blur-md border border-border/50 rounded-2xl p-4 shadow-elegant min-w-[200px]"
-              >
-                <div className="space-y-3">
-                  <button
-                    onClick={handleWhatsAppClick}
-                    className="flex items-center space-x-3 w-full p-3 rounded-xl bg-green-500/10 hover:bg-green-500/20 text-green-600 transition-smooth group"
-                  >
-                    <MessageCircle className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                    <div className="text-left">
-                      <div className="font-medium text-sm">WhatsApp</div>
-                      <div className="text-xs opacity-70">Resposta rápida</div>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="flex items-center space-x-3 w-full p-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-smooth group"
-                  >
-                    <Calendar className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                    <div className="text-left">
-                      <div className="font-medium text-sm">Ver Serviços</div>
-                      <div className="text-xs opacity-70">Escolha seu tratamento</div>
-                    </div>
-                  </button>
-                </div>
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setIsExpanded(false)}
+                  className="fixed inset-0 bg-black/20 backdrop-blur-sm -z-10"
+                />
                 
-                <div className="mt-4 pt-3 border-t border-border/50 text-center">
-                  <p className="text-xs text-muted-foreground">
-                    ⏰ Resposta em até 5 minutos
-                  </p>
-                </div>
-              </motion.div>
+                {/* Menu Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute bottom-20 right-0 w-72 bg-white rounded-2xl shadow-2xl border border-pink-100 overflow-hidden"
+                >
+                  {/* Header */}
+                  <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-4 text-white">
+                    <h3 className="font-semibold text-lg">Agende seu horário</h3>
+                    <p className="text-sm text-pink-50">Escolha como prefere continuar</p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="p-4 space-y-3">
+                    <button
+                      onClick={handleWhatsAppClick}
+                      className="flex items-center space-x-4 w-full p-4 rounded-xl bg-green-50 hover:bg-green-100 border border-green-200 transition-all duration-300 group hover:scale-[1.02] hover:shadow-lg"
+                    >
+                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <MessageCircle className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="text-left flex-1">
+                        <div className="font-semibold text-gray-800">WhatsApp</div>
+                        <div className="text-xs text-gray-600">Resposta rápida garantida</div>
+                      </div>
+                      <div className="text-green-600 font-bold">→</div>
+                    </button>
+                  
+                    <button
+                      onClick={() => {
+                        setIsExpanded(false);
+                        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="flex items-center space-x-4 w-full p-4 rounded-xl bg-pink-50 hover:bg-pink-100 border border-pink-200 transition-all duration-300 group hover:scale-[1.02] hover:shadow-lg"
+                    >
+                      <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Calendar className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="text-left flex-1">
+                        <div className="font-semibold text-gray-800">Ver Serviços</div>
+                        <div className="text-xs text-gray-600">Escolha seu tratamento</div>
+                      </div>
+                      <div className="text-pink-600 font-bold">→</div>
+                    </button>
+                  </div>
+                
+                  {/* Footer */}
+                  <div className="px-4 pb-4 pt-2 border-t border-gray-100">
+                    <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                      <span>Atendimento disponível agora</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
 
           {/* Main Button */}
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="relative"
+          <motion.button
+            onClick={() => setIsExpanded(!isExpanded)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full shadow-xl hover:shadow-2xl transition-shadow flex items-center justify-center group overflow-hidden"
           >
-            <Button
-              onClick={() => setIsExpanded(!isExpanded)}
-              variant="floating"
-              className="shadow-elegant hover:shadow-rose group"
-            >
-              <motion.div
-                animate={{ rotate: isExpanded ? 45 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Calendar className="h-6 w-6" />
-              </motion.div>
-            </Button>
-
-            {/* Pulse Animation */}
+            {/* Animated gradient background */}
             <motion.div
               animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 0, 0.5],
+                background: [
+                  'linear-gradient(45deg, #ec4899, #f43f5e)',
+                  'linear-gradient(45deg, #f43f5e, #ec4899)',
+                ],
               }}
               transition={{
-                duration: 2,
+                duration: 3,
                 repeat: Infinity,
-                ease: "easeInOut"
+                repeatType: "reverse"
               }}
-              className="absolute inset-0 bg-gradient-primary rounded-full"
+              className="absolute inset-0"
             />
 
-            {/* Notification Badge */}
+            {/* Icon */}
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg"
+              animate={{ rotate: isExpanded ? 90 : 0 }}
+              transition={{ duration: 0.3 }}
+              className="relative z-10"
             >
+              {isExpanded ? (
+                <X className="h-7 w-7 text-white" />
+              ) : (
+                <Calendar className="h-7 w-7 text-white" />
+              )}
+            </motion.div>
+
+            {/* Pulse Animation Ring */}
+            {!isExpanded && (
               <motion.div
                 animate={{
-                  scale: [1, 1.2, 1],
+                  scale: [1, 1.4, 1],
+                  opacity: [0.6, 0, 0.6],
                 }}
                 transition={{
-                  duration: 1.5,
+                  duration: 2,
                   repeat: Infinity,
+                  ease: "easeInOut"
                 }}
-              >
-                !
-              </motion.div>
-            </motion.div>
-          </motion.div>
+                className="absolute inset-0 bg-pink-400 rounded-full"
+              />
+            )}
 
-          {/* Quick Actions Tooltip */}
-          {!isExpanded && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-card/95 backdrop-blur-sm border border-border/50 rounded-lg px-3 py-2 shadow-elegant pointer-events-none"
-            >
-              <div className="text-sm font-medium whitespace-nowrap">
-                AGENDAR AGORA
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Clique para opções
-              </div>
-              
-              {/* Arrow */}
-              <div className="absolute right-0 top-1/2 transform translate-x-1 -translate-y-1/2 w-0 h-0 border-l-4 border-l-card/95 border-t-2 border-b-2 border-t-transparent border-b-transparent" />
-            </motion.div>
-          )}
+            {/* Notification Badge */}
+            {!isExpanded && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-7 h-7 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white"
+              >
+                <motion.div
+                  animate={{
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                  }}
+                  className="text-white text-sm font-bold"
+                >
+                  !
+                </motion.div>
+              </motion.div>
+            )}
+          </motion.button>
+
+          {/* Floating Tooltip */}
+          <AnimatePresence>
+            {!isExpanded && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ delay: 0.5 }}
+                className="absolute right-20 top-1/2 transform -translate-y-1/2 pointer-events-none"
+              >
+                <div className="bg-gray-900 text-white px-4 py-2 rounded-lg shadow-xl relative">
+                  <div className="font-semibold text-sm whitespace-nowrap">
+                    Agende Agora! ✨
+                  </div>
+                  <div className="text-xs text-gray-300">
+                    Clique para opções
+                  </div>
+                  
+                  {/* Arrow */}
+                  <div className="absolute right-0 top-1/2 transform translate-x-2 -translate-y-1/2">
+                    <div className="w-0 h-0 border-l-8 border-l-gray-900 border-t-4 border-b-4 border-t-transparent border-b-transparent" />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
